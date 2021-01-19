@@ -1,13 +1,11 @@
-*.js
 .serverless
+.webpack
 *.log
 npm-debug.log
 dist
 lib-cov
 coverage
 node_modules
-.idea
-.vscode
 .DS_Store
 .tmp
 .env
