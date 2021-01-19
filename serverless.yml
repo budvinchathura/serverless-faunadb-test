@@ -1,0 +1,62 @@
+service: serverless-faunadb-test
+
+frameworkVersion: "2.5.0"
+
+custom:
+  webpack: webpack.config.js
+  webpackIncludeModules:
+    packagePath: package.json
+    forceExclude:
+      - aws-sdk
+
+# Add the serverless-webpack plugin
+plugins:
+  - serverless-webpack
+
+package:
+  include:
+    todos/**/!(*.spec).js
+  exclude:
+    - node_modules/**/*
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+
+functions:
+  create:
+    handler: todos/create.create
+    events:
+      - http:
+          path: todos
+          method: post
+          cors: true
+
+  list:
+    handler: todos/list.list
+    events:
+      - http:
+          path: todos
+          method: get
+          cors: true
+        
+  get:
+    handler: todos/get.get
+    events:
+      - http:
+          path: todos/{id}
+          method: get
+          cors: true
+        
+  update:
+    handler: todos/update.update
+    events:
+      - http:
+          path: todos/{id}
+          method: put
+          cors: true        
+

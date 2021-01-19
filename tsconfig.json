@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs"
+  },
+  "exclude": [
+    "node_modules",
+    "coverage",
+    "webpack.config.js"
+  ],
+  "include": ["./**/*.ts"],
+  "types": [
+    "node",
+    "aws-sdk"
+  ]
+}
