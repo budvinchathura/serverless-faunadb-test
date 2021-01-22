@@ -58,5 +58,20 @@ functions:
       - http:
           path: users/{id}
           method: put
+          cors: true
+  follow:
+    handler: users/follow.follow
+    events:
+      - http:
+          path: follow
+          method: post
+          cors: true 
+
+  unfollow:
+    handler: users/unfollow.unfollow
+    events:
+      - http:
+          path: unfollow
+          method: delete
           cors: true        
 

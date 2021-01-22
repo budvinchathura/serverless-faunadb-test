@@ -6,33 +6,32 @@ import { buildResponse, formatObject, handleException } from './util'
 import { FaunaDBObject } from './types';
 
 const q = faunadb.query;
-const { Create, Collection } = q;
+const { Create, Collection, Ref } = q;
 
-export const create = async (event: APIGatewayEvent, context: Context, callback): Promise<ProxyResult> => {
+export const follow = async (event: APIGatewayEvent, context: Context, callback): Promise<ProxyResult> => {
   try {
     const data = JSON.parse(event.body)
-    if (!data.name || !data.dob || !data.city || !data.email) {
+    if (!data.from || !data.to) {
       console.error('Validation Failed')
       const response = { status: 'ERROR', message: 'validation failed' }
       return buildResponse(response, 400)
     }
     const faunadbClient = new faunadb.Client({ secret: process.env.FAUNADB_SECRET_KEY, keepAlive: false });
 
-    const user: FaunaDBObject = await faunadbClient.query(
+    const followRecord: FaunaDBObject = await faunadbClient.query(
       Create(
-        Collection('users'),
+        Collection('follows'),
         {
           data: {
-            name: data.name,
-            dob: data.dob,
-            city: data.city,
-            email: data.email
+            from: Ref(Collection('users'), data.from),
+            to: Ref(Collection('users'), data.to),
+            followedOn: (new Date()).toISOString(),
           }
         }
       )
     )
 
-    const response = { status: 'SUCCESS', data: { user: formatObject(user) } }
+    const response = { status: 'SUCCESS', data: { followRecord: formatObject(followRecord) } }
     return buildResponse(response, 200);
   } catch (error) {
     return handleException(error);
