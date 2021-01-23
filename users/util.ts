@@ -12,10 +12,10 @@ export const buildResponse = (body: any, statusCode: number): ProxyResult => {
   return response
 }
 
-export const handleException = (error: Error): ProxyResult => {
+export const handleException = (error: any): ProxyResult => {
   console.error(error);
 
-  return buildResponse({ status: 'ERROR', message: error }, 500);
+  return buildResponse({ status: 'ERROR', message: error }, error?.requestResult?.statusCode ?? 500);
 }
 
 export const formatObject = (faunaObject: FaunaDBObject): unknown => {

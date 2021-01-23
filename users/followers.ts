@@ -1,6 +1,5 @@
 import { APIGatewayEvent, Context, ProxyResult } from 'aws-lambda';
 import * as faunadb from 'faunadb';
-import { join } from 'path';
 import { FaunaDBListResult } from './types';
 import { buildResponse, formatObject, handleException } from './util';
 
