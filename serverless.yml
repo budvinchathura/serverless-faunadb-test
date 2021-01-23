@@ -73,5 +73,13 @@ functions:
       - http:
           path: unfollow
           method: delete
-          cors: true        
+          cors: true  
+          
+  followers:
+    handler: users/followers.followers
+    events:
+      - http:
+          path: followers/{id}
+          method: get
+          cors: true
 
