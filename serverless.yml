@@ -83,3 +83,10 @@ functions:
           method: get
           cors: true
 
+  remove:
+    handler: users/remove.remove
+    events:
+      - http:
+          path: users/{id}
+          method: delete
+          cors: true

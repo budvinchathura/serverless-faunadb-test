@@ -20,7 +20,7 @@ export const followers = async (event: APIGatewayEvent, context: Context, callba
     const followers: FaunaDBListResult = await faunadbClient.query(
       Map(
         Paginate(Match(
-          Index("follows_to_index"),
+          Index("followee_ref_by_follower_index"),
           Ref(Collection("users"), id)
         )),
         Lambda('ref', Get(Var('ref')))
