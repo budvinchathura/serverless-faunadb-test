@@ -1,80 +1,191 @@
-<!--
-title: TODO
-description: This example shows your how to create a TypeScript powered REST API with DynamoDB.
-layout: Doc
-framework: v1
-platform: AWS
-language: nodeJS
-authorLink: 'https://github.com/QuantumInformation'
-authorName: Nikos
-authorAvatar: 'https://avatars0.githubusercontent.com/u/216566?v=4&s=140'
--->
-
 # Introduction
 
-TypeScript (ts) offers type safety which is helpful when working with the AWS SDK, which comes with ts definitions (d.ts)
+Complete source code used with serverless faundb tutorial medium article.
+&nbsp;
 
-# compiling
+# Prerequisites and Configuration
 
-You can compile the ts files in this directory by 1st installing typescript via
-
-`npm install -g typescript`
-
-then
-
-`npm i`
-
-You can then run the compiler by running `tsc` in this directory. It will pull the settings from .tsconfig and extra @types
-from package.json. The output create.js file is what will be uploaded by serverless.
-
-For brevity, I have just demonstrated this to match with the todos/create.js, todos/list.js, todos/get.js and todos/update.js lambda function
-
-## Usage
-
-You can create, retrieve, update, or delete todos with the following commands:
-
-### Create a Todo
+ - Configured AWS CLI with administrator IAM role.
+ - Create a database with faunadb and store access secret in a new file `env.json` in project root directory. File content should be as following where xxxxx is replaced with your access secret
+```json
+{
+    "FAUNADB_SECRET_KEY":"xxxxx"
+}
+```
+ - Install `serverless` as a global npm package
 
 ```bash
-curl -X POST https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/todos --data '{ "text": "Learn Serverless" }'
+npm install -g serverless
+```
+ - Install local dependencies
+```bash
+npm install
+```
+
+ - Execute `fauna-setup.js` with node environment to setup Collections and Indexes in fauna Database
+
+```bash
+node fauna-setup.js
+```
+&nbsp;
+
+# Deploy to AWS
+
+Simply run the following command in terminal inside project root.
+```bash
+serverless deploy
+```
+
+If everything goes well, after few minutes, last few lines of the final output should look like the following text.\
+'xxx' will be replaced with a unique id for your service
+```
+...
+...
+Service Information
+service: serverless-faunadb-test
+stage: dev
+region: us-east-1
+stack: serverless-faunadb-test-dev
+resources: 56
+api keys:
+  None
+endpoints:
+  POST - https://xxx.execute-api.us-east-1.amazonaws.com/dev/users
+  GET - https://xxx.execute-api.us-east-1.amazonaws.com/dev/users
+  GET - https://xxx.execute-api.us-east-1.amazonaws.com/dev/users/{id}
+  PUT - https://xxx.execute-api.us-east-1.amazonaws.com/dev/users/{id}
+  POST - https://xxx.execute-api.us-east-1.amazonaws.com/dev/follow
+  DELETE - https://xxx.execute-api.us-east-1.amazonaws.com/dev/unfollow
+  GET - https://xxx.execute-api.us-east-1.amazonaws.com/dev/followers/{id}
+  DELETE - https://xxx.execute-api.us-east-1.amazonaws.com/dev/users/{id}
+functions:
+  create: serverless-faunadb-test-dev-create
+  list: serverless-faunadb-test-dev-list
+  get: serverless-faunadb-test-dev-get
+  update: serverless-faunadb-test-dev-update
+  follow: serverless-faunadb-test-dev-follow
+  unfollow: serverless-faunadb-test-dev-unfollow
+  followers: serverless-faunadb-test-dev-followers
+  remove: serverless-faunadb-test-dev-remove
+layers:
+  None
+```
+Now the service is deployed in AWS region `us-east-1` and you can check the created resources by login into AWS console and visiting https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks . It should show a new stack called `serverless-faunadb-test-dev`
+
+&nbsp;
+
+# Usage
+
+Now you can use the API to do following tasks
+ - Create user
+ - Get user
+ - List users
+ - Update user
+ - Add followers to a user
+ - Remove followers from a user
+ - List followers of a user
+ - Remove a user
+
+## Create a user
+
+```bash
+curl --request POST https://xxx.execute-api.us-east-1.amazonaws.com/dev/users --header "Content-Type: application/json" --data-raw '{"name":"Test user 1", "dob":"2000-01-01","email":"abc@abc.com","city":"Downtown"}'
 ```
 
 Example Result:
+
+*'id' field value might be different.*
 ```bash
-{"text":"Learn Serverless","id":"ee6490d0-aa11e6-9ede-afdfa051af86","createdAt":1479138570824,"checked":false,"updatedAt":1479138570824}%
+{"status":"SUCCESS","data":{"user":{"name":"Test user 1","dob":"2000-01-01","city":"Downtown","email":"abc@abc.com","id":"288601255069090308"}}}
 ```
 
-### List all Todos
+## Get user
 
 ```bash
-curl https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/todos
+# Replace user_id with the id of the user
+curl https://xxx.execute-api.us-east-1.amazonaws.com/dev/users/user_id
 ```
 
 Example output:
 ```bash
-[{"text":"Deploy my first service","id":"ac90feaa11e6-9ede-afdfa051af86","checked":true,"updatedAt":1479139961304},{"text":"Learn Serverless","id":"206793aa11e6-9ede-afdfa051af86","createdAt":1479139943241,"checked":false,"updatedAt":1479139943241}]%
+{"status":"SUCCESS","data":{"user":{"name":"Test user 1","dob":"2000-01-01","city":"Downtown","email":"abc@abc.com","id":"288601255069090308"}}}
 ```
 
-### Get one Todo
+## List users
 
 ```bash
-# Replace the <id> part with a real id from your todos table
-curl https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/todos/<id>
+curl https://xxx.execute-api.us-east-1.amazonaws.com/dev/users
+```
+
+Example output:
+```bash
+{"status":"SUCCESS","data":{"users":[{"name":"Test user 2","dob":"1990-03-15","city":"New City","email":"test@abc.com","id":"288254855497122309"},{"name":"Test user 1","dob":"2000-01-01","city":"Downtown","email":"abc@abc.com","id":"288601255069090308"}]}}
+
+```
+
+## Update a user
+
+```bash
+# Replace user_id with the id of the user
+curl --request PUT https://xxx.execute-api.us-east-1.amazonaws.com/dev/users/user_id --header "Content-Type: application/json" --data-raw '{"name":"Test user 11", "email":"xyz@abc.com"}'
 ```
 
 Example Result:
+
+*'id' field value might be different.*
 ```bash
-{"text":"Learn Serverless","id":"ee6490d0-aa11e6-9ede-afdfa051af86","createdAt":1479138570824,"checked":false,"updatedAt":1479138570824}%
+{"status":"SUCCESS","data":{"user":{"name":"Test user 11","dob":"2000-01-01","city":"Downtown","email":"xyz@abc.com","id":"288601255069090308"}}}
 ```
 
-### Update a Todo
+## Follow a user
+The convention is *`'from'` user follows `'to'` user*.
 
 ```bash
-# Replace the <id> part with a real id from your todos table
-curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/todos/<id> --data '{ "text": "Learn Serverless", "checked": true }'
+# Replace from_user_id and to_user_id with necessary values
+curl --request POST https://xxx.execute-api.us-east-1.amazonaws.com/dev/follow/ --header "Content-Type: application/json" --data-raw '{ "from":"from_user_id", "to":"to_user_id" }'
 ```
 
 Example Result:
+
+*Returns a reference to follow record. Some id field values will be different.*
 ```bash
-{"text":"Learn Serverless","id":"ee6490d0-aa11e6-9ede-afdfa051af86","createdAt":1479138570824,"checked":true,"updatedAt":1479138570824}%
+{"status":"SUCCESS","data":{"followRecord":{"from":{"@ref":{"id":"288254855497122309","collection":{"@ref":{"id":"users","collection":{"@ref":{"id":"collections"}}}}}},"to":{"@ref":{"id":"288601255069090308","collection":{"@ref":{"id":"users","collection":{"@ref":{"id":"collections"}}}}}},"followedOn":"2021-01-24T12:44:25.384Z","id":"288603154122015232"}}}
+```
+
+## Unfollow a user
+
+```bash
+# Replace from_user_id and to_user_id with necessary values
+curl --request DELETE https://xxx.execute-api.us-east-1.amazonaws.com/dev/unfollow/ --header "Content-Type: application/json" --data-raw '{ "from":"from_user_id", "to":"to_user_id" }'
+```
+
+Example Result:
+
+```bash
+{"status":"SUCCESS","data":{"followRecord":{"from":{"@ref":{"id":"288254855497122309","collection":{"@ref":{"id":"users","collection":{"@ref":{"id":"collections"}}}}}},"to":{"@ref":{"id":"288601255069090308","collection":{"@ref":{"id":"users","collection":{"@ref":{"id":"collections"}}}}}},"followedOn":"2021-01-24T12:44:25.384Z","id":"288603154122015232"}}}
+```
+
+## List followers of a user
+
+```bash
+# Replace user_id with the id of the user
+curl https://xxx.execute-api.us-east-1.amazonaws.com/dev/followers/user_id
+```
+
+Example output:
+```bash
+{"status":"SUCCESS","data":{"followers":[{"name":"User abc","dob":"2000-01-01","city":"Colombo","email":"test@test.com","id":"288246266470597125"},{"name":"User 20","dob":"1997-02-05","city":"New City","email":"abc@abc.com","id":"288254855497122309"}]}}
+
+```
+
+## Remove user
+
+```bash
+# Replace user_id with the id of the user
+curl --request DELETE https://xxx.execute-api.us-east-1.amazonaws.com/dev/users/user_id
+```
+
+Example output:
+```bash
+{"status":"SUCCESS"}
 ```
