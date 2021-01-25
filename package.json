@@ -2,11 +2,8 @@
   "name": "serverless-faunadb-test",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tsc -w",
-    "lint": "tslint '*.ts'"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +15,7 @@
     "@typescript-eslint/eslint-plugin": "^4.14.0",
     "@typescript-eslint/parser": "^4.14.0",
     "eslint": "^7.18.0",
-    "serverless": "^2.5.0",
+    "serverless": "2.5.0",
     "serverless-offline": "^6.8.0",
     "serverless-webpack": "^5.3.5",
     "ts-loader": "^6.0.4",
@@ -27,7 +24,6 @@
   },
   "dependencies": {
     "aws-sdk": "^2.828.0",
-    "faunadb": "^4.0.0",
-    "uuid": "^3.1.0"
+    "faunadb": "^4.0.0"
   }
 }

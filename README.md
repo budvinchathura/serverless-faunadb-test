@@ -1,6 +1,7 @@
 # Introduction
 
-Complete source code used with serverless faundb tutorial medium article.
+Complete source code used with serverless faundb medium article.
+Starter code can be viewed in https://github.com/budvinchathura/serverless-faunadb-test-starter
 &nbsp;
 
 # Prerequisites and Configuration

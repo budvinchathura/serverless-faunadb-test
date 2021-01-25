@@ -1,5 +1,3 @@
-import * as uuid from 'uuid'
-
 import { APIGatewayEvent, Context, ProxyResult } from 'aws-lambda'
 import * as faunadb from 'faunadb'
 import { buildResponse, formatObject, handleException } from './util'
