@@ -189,3 +189,10 @@ Example output:
 ```bash
 {"status":"SUCCESS"}
 ```
+&nbsp;
+
+## Offline (Local) Execution
+If you are on a Windows environment with VSCode editor, you will be able to use `.vscode/launch.json` to directly run this service in your local machine. For other environments the same file can be used with minor modifications. \
+&nbsp;
+
+When running locally, URL s will be prefixed as `localhost`. For example https://xxx.execute-api.us-east-1.amazonaws.com/dev/users is changed to http://localhost:3333/dev/users when running locally.
